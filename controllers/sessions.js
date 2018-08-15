@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt')
 const express = require('express')
 const sessions = express.Router()
 const User = require('../models/users')
@@ -7,9 +8,9 @@ sessions.post('/', async (req, res) => {
     const user = await User.findOne(
       { username: req.body.username }
     )
-    if (req.body.password === user.password) {
+    if (bcrypt.compareSync(req.body.password, user.password)) {
       req.session.currentUser = user
-      res.status(200).json({message: 'successful log in', login: true})
+      res.status(200).json({user: user.username, login: true})
     } else {
       res.status(418).json({message: 'wrong password'})
     }
